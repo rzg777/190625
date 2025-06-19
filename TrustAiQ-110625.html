@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustAiQ by V1 - EU AI Act Compliance Wizard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .wizard-screen {
+            display: none;
+        }
+        .wizard-screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .active {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .option-button.selected {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+            border-color: #4f46e5;
+        }
+        .option-button.selected svg {
+            color: white;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #6b7280;
+        }
+        .modal-container h2 {
+            margin-top: 0;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="wizard-container bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-3xl">
+        <!-- Main Header -->
+        <header class="wizard-header bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 text-center">
+            <div class="flex justify-center items-center gap-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                <h1 class="text-3xl font-bold">TrustAiQ by V1</h1>
+            </div>
+            <p class="mt-2 text-indigo-200">EU AI Act Compliance Wizard</p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div id="progressBarContainer" class="p-6 bg-white border-b border-slate-200 hidden">
+            <div class="flex justify-between items-start">
+                <!-- Step 1 -->
+                <div class="progress-step text-center w-1/4" data-step="1">
+                    <div class="progress-step-number relative mx-auto w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg border-2 border-slate-200 transition-all duration-300">1</div>
+                    <div class="progress-step-label text-xs sm:text-sm font-semibold text-slate-500 mt-2">Role</div>
+                </div>
+                <!-- Step 2 -->
+                <div class="progress-step text-center w-1/4" data-step="2">
+                    <div class="progress-step-number relative mx-auto w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg border-2 border-slate-200 transition-all duration-300">2</div>
+                    <div class="progress-step-label text-xs sm:text-sm font-semibold text-slate-500 mt-2">Use Case</div>
+                </div>
+                <!-- Step 3 -->
+                <div class="progress-step text-center w-1/4" data-step="3">
+                    <div class="progress-step-number relative mx-auto w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg border-2 border-slate-200 transition-all duration-300">3</div>
+                    <div class="progress-step-label text-xs sm:text-sm font-semibold text-slate-500 mt-2">Impact</div>
+                </div>
+                <!-- Step 4 -->
+                <div class="progress-step text-center w-1/4" data-step="4">
+                    <div class="progress-step-number relative mx-auto w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg border-2 border-slate-200 transition-all duration-300">4</div>
+                    <div class="progress-step-label text-xs sm:text-sm font-semibold text-slate-500 mt-2">Documentation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 1: Welcome -->
+        <div id="screen-1" class="wizard-screen active p-8 text-center">
+             <div class="bg-slate-100 p-4 rounded-lg text-left text-sm text-slate-600 max-w-2xl mx-auto mb-6">
+                <p class="mb-2"><strong>ℹ️ What is this wizard?</strong></p>
+                <ul class="list-disc pl-6 space-y-1">
+                <li>This wizard helps organizations understand if their AI systems may fall under the <a class="text-indigo-600 underline" href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng" target="_blank">EU AI Act</a>.</li>
+                <li>It asks a few key questions to assess your potential risk level: <em>High, Limited, or Minimal Risk</em>.</li>
+                <li>The results are informational only and do not constitute legal advice.</li>
+                </ul>
+                <p class="mt-3">📝 We also recommend reading our <a href="#" target="_blank" class="text-indigo-600 underline">Quick Guide to the EU AI Act (PDF)</a>.</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-message-square mx-auto text-indigo-500 mb-4"><path d="M12 6V2H8"/><path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z"/><path d="M2 12h2"/><path d="M9 11v.01"/><path d="M15 11v.01"/></svg>
+            <h2 class="text-3xl font-bold text-slate-800 mb-3">Welcome to the AI Act Compliance Wizard!</h2>
+            <p class="text-slate-600 mb-8 max-w-prose mx-auto">This wizard will guide you through a few simple steps to help assess your AI system's potential compliance level with the EU AI Act. Understanding your obligations is the first step towards responsible AI.</p>
+            <button class="cta-button bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105" id="getStartedBtn">Get Started</button>
+            <div class="mt-8 text-xs text-slate-400 space-y-1">
+                <p>Beta Version</p>
+                <p>This wizard is based on the principles of the <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng" target="_blank" class="text-indigo-500 hover:underline">EU AI Act</a>.</p>
+                <p>Use of the wizard is subject to the <a href="#" id="termsLinkIntro" class="text-indigo-500 hover:underline">terms of use</a>.</p>
+            </div>
+        </div>
+
+        <!-- Screen 2: Role Identification -->
+        <div id="screen-2" class="wizard-screen p-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Step 1: Role Identification</h2>
+            <p class="text-slate-600 mb-6">What best describes your organization's role in relation to the AI system?</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button class="option-button" data-question="role" data-value="Provider">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-factory"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg>
+                    <span>Provider / Developer</span>
+                </button>
+                <button class="option-button" data-question="role" data-value="Distributor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H15"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                    <span>Distributor</span>
+                </button>
+                <button class="option-button" data-question="role" data-value="User">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-cog"><circle cx="18" cy="15" r="3"/><circle cx="9" cy="7" r="4"/><path d="M12 15h-1a2 2 0 0 0-2 2v2"/><path d="m21.7 16.4-.9-.3"/><path d="m15.2 13.9-.9-.3"/><path d="m15.2 16.1.9-.3"/><path d="m21.7 13.6.9-.3"/><path d="m19.6 21.7-.3-.9"/><path d="m13.9 15.2-.3-.9"/><path d="m16.1 15.2.3-.9"/><path d="m13.6 21.7-.3-.9"/><path d="m19.6 18.4.3.9"/><path d="m13.9 19.8.3.9"/><path d="m16.1 19.8-.3.9"/><path d="m13.6 18.4-.3.9"/></svg>
+                    <span>User</span>
+                </button>
+                <button class="option-button" data-question="role" data-value="I'm not sure">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                    <span>I'm not sure</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Use Case -->
+        <div id="screen-3" class="wizard-screen p-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Step 2: Use Case</h2>
+            <p class="text-slate-600 mb-6">Does your AI system involve any of the following sensitive or high-impact areas?</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button class="option-button" data-question="useCase" data-value="Employment">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span>Employment</span>
+                </button>
+                 <button class="option-button" data-question="useCase" data-value="Biometrics">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-face"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                    <span>Biometrics</span>
+                </button>
+                <button class="option-button" data-question="useCase" data-value="Credit">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                    <span>Credit Scoring</span>
+                </button>
+                <button class="option-button" data-question="useCase" data-value="Healthcare">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-pulse"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.7-1.5L11.5 14l1.5-3 1.5 3h5.27"/></svg>
+                    <span>Healthcare</span>
+                </button>
+                <button class="option-button" data-question="useCase" data-value="Critical infrastructure">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+                    <span>Critical Infrastructure</span>
+                </button>
+                <button class="option-button" data-question="useCase" data-value="Education">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12v5a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-5"/></svg>
+                    <span>Education</span>
+                </button>
+                 <button class="option-button col-span-1 sm:col-span-2 lg:col-span-3" data-question="useCase" data-value="None">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                    <span>None of the above</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Decision Impact -->
+        <div id="screen-4" class="wizard-screen p-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Step 3: Decision Impact</h2>
+            <p class="text-slate-600 mb-6">Does your AI system directly influence significant decisions about individuals (e.g., access to services, legal effects)?</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button class="option-button" data-question="decisionImpact" data-value="Yes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span>Yes</span>
+                </button>
+                <button class="option-button" data-question="decisionImpact" data-value="No">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <span>No</span>
+                </button>
+                <button class="option-button sm:col-span-2" data-question="decisionImpact" data-value="I'm not sure">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                    <span>I'm not sure</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 5: Documentation -->
+        <div id="screen-5" class="wizard-screen p-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Step 4: Documentation</h2>
+            <p class="text-slate-600 mb-6">Do you have comprehensive documentation explaining how your AI system functions, its capabilities, limitations, and intended purpose?</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button class="option-button" data-question="documentation" data-value="Yes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span>Yes</span>
+                </button>
+                <button class="option-button" data-question="documentation" data-value="No">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <span>No</span>
+                </button>
+                 <button class="option-button sm:col-span-2" data-question="documentation" data-value="I'm not sure">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                    <span>I'm not sure</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 6: Results -->
+        <div id="screen-6" class="wizard-screen result-screen p-8 text-center">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6">Assessment Results</h2>
+            <div id="resultBox" class="result-box rounded-xl p-6 mb-6" role="alert">
+                <div id="resultIcon" class="mb-4"></div>
+                <h3 id="resultStatus" class="text-2xl font-bold mb-2"></h3>
+                <div class="text-left mt-6">
+                    <h4 class="font-bold text-lg mt-4 mb-2">Risk Description:</h4>
+                    <p id="resultRisk" class="text-base"></p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">Recommended Actions:</h4>
+                    <div id="resultActions" class="text-base space-y-2"></div>
+                </div>
+            </div>
+            <div class="contact-cta bg-slate-100 p-6 rounded-lg text-center">
+                <p class="text-slate-800 text-lg font-semibold mb-2">We'd be happy to be in touch</p>
+                <p class="text-slate-600">For any questions and/or clarifications, please contact: <a href="mailto:info@venture1.biz" class="font-semibold text-indigo-600 hover:underline">info@venture1.biz</a></p>
+            </div>
+            <button class="nav-button mt-8 bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg hover:bg-slate-300 transition" id="restartBtn">Start Over</button>
+             <div class="mt-8 text-xs text-slate-400 space-y-1">
+                <p>Beta Version</p>
+                <p>Use of the wizard is subject to the <a href="#" id="termsLinkResult" class="text-indigo-500 hover:underline">terms of use</a>.</p>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons p-6 bg-slate-50 border-t border-slate-200 flex justify-between items-center hidden" id="navButtons">
+            <button class="nav-button prev font-bold py-2 px-5 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed" id="prevBtn" disabled>Previous</button>
+            <button class="nav-button next font-bold py-2 px-5 rounded-md bg-indigo-600 text-white shadow hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed" id="nextBtn" disabled>Next</button>
+        </div>
+
+    </div>
+    
+    <!-- Terms of Use Modal -->
+    <div id="termsModal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <span id="closeModalBtn" class="modal-close-btn">&times;</span>
+            <div class="prose max-w-none">
+                <h2>TrustAiQ – Terms of Use (Beta Version)</h2>
+                <h3>Legal Notice</h3>
+                <p>The TrustAiQ application is a <strong>beta-stage informational tool</strong> developed by V1 (Venture1) to support businesses in navigating regulatory and governance considerations related to Artificial Intelligence (AI), particularly in light of the EU AI Act and related frameworks.</p>
+                <p><strong>This tool is not a substitute for legal advice</strong> and should not be relied upon to determine legal rights or obligations. You are solely responsible for ensuring compliance with applicable laws and regulations.</p>
+                <hr class="my-4">
+                <h3>Disclaimer of Liability</h3>
+                <ul>
+                    <li>The outputs generated by TrustAiQ are based on user input and publicly available regulatory guidance.</li>
+                    <li>While efforts have been made to ensure accuracy, <strong>we do not guarantee the completeness, accuracy, or currency</strong> of any information provided.</li>
+                    <li>V1 shall not be held liable for any direct or indirect damages arising from the use or misuse of this application or its outputs.</li>
+                </ul>
+                 <hr class="my-4">
+                <h3>Data Handling</h3>
+                <ul>
+                    <li>Information you enter into the platform may be <strong>processed using third-party systems</strong>, including large language models (LLMs).</li>
+                    <li>Do not enter any sensitive, confidential, or personally identifiable information.</li>
+                    <li>By using the platform, you consent to the processing of your data for the purposes of generating compliance-related outputs.</li>
+                </ul>
+                <hr class="my-4">
+                <h3>Intellectual Property</h3>
+                <p>All content, prompts, UI elements, and documentation associated with TrustAiQ are the <strong>intellectual property of V1 (Venture1)</strong>. You may not reproduce, modify, or distribute this content without explicit permission.</p>
+                <hr class="my-4">
+                <h3>Updates & Changes</h3>
+                <p>This tool is under <strong>active development</strong>. Features, content, and recommendations may change at any time. V1 reserves the right to modify or discontinue the service without notice.</p>
+                <hr class="my-4">
+                <h3>Acceptance of Terms</h3>
+                <p>By using TrustAiQ, you acknowledge and accept the terms outlined above. If you do not agree with these terms, please do not use the tool.</p>
+                <p>For any questions or feedback, contact: <strong>info@venture1.biz</strong></p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Element variables
+            const screens = document.querySelectorAll('.wizard-screen');
+            const getStartedBtn = document.getElementById('getStartedBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const navButtonsContainer = document.getElementById('navButtons');
+            const restartBtn = document.getElementById('restartBtn');
+            const progressBarContainer = document.getElementById('progressBarContainer');
+            const progressSteps = document.querySelectorAll('.progress-step');
+            
+            // Result screen elements
+            const resultBox = document.getElementById('resultBox');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultStatus = document.getElementById('resultStatus');
+            const resultRisk = document.getElementById('resultRisk');
+            const resultActions = document.getElementById('resultActions');
+
+            // Modal elements
+            const termsModal = document.getElementById('termsModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const termsLinkIntro = document.getElementById('termsLinkIntro');
+            const termsLinkResult = document.getElementById('termsLinkResult');
+
+            let currentScreenIndex = 0;
+            const totalQuestionScreens = 4;
+
+            const userAnswers = {
+                role: null,
+                useCase: null,
+                decisionImpact: null,
+                documentation: null
+            };
+            
+            // Function to show a specific screen
+            function showScreen(index) {
+                screens.forEach((screen, i) => screen.classList.toggle('active', i === index));
+                currentScreenIndex = index;
+                updateProgressBar();
+                updateNavButtons();
+
+                const isIntroScreen = index === 0;
+                const isResultScreen = index === screens.length - 1;
+                navButtonsContainer.style.display = (isIntroScreen || isResultScreen) ? 'none' : 'flex';
+                progressBarContainer.style.display = (isIntroScreen || isResultScreen) ? 'none' : 'block';
+            }
+            
+            // Function to update the progress bar
+            function updateProgressBar() {
+                const currentStep = currentScreenIndex;
+                progressSteps.forEach(step => {
+                    const stepNumber = parseInt(step.dataset.step, 10);
+                    const numberDiv = step.querySelector('.progress-step-number');
+                    numberDiv.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600', 'ring-4', 'ring-indigo-200');
+
+                    if (stepNumber < currentStep) {
+                        numberDiv.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+                    } else if (stepNumber === currentStep) {
+                        numberDiv.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'ring-4', 'ring-indigo-200');
+                    }
+                });
+            }
+            
+            // Function to update navigation buttons state
+            function updateNavButtons() {
+                prevBtn.disabled = currentScreenIndex <= 1;
+                const currentQuestionKey = screens[currentScreenIndex].querySelector('.option-button')?.dataset.question;
+                nextBtn.disabled = currentQuestionKey ? !userAnswers[currentQuestionKey] : true;
+                nextBtn.textContent = (currentScreenIndex === totalQuestionScreens) ? 'View Results' : 'Next';
+            }
+
+            // --- Event Listeners ---
+            getStartedBtn.addEventListener('click', () => showScreen(1));
+            prevBtn.addEventListener('click', () => (currentScreenIndex > 1) && showScreen(currentScreenIndex - 1));
+            nextBtn.addEventListener('click', () => {
+                if (currentScreenIndex < screens.length - 1) {
+                    if (currentScreenIndex === totalQuestionScreens) {
+                        evaluateResults();
+                        showScreen(screens.length - 1);
+                    } else {
+                        showScreen(currentScreenIndex + 1);
+                    }
+                }
+            });
+            restartBtn.addEventListener('click', () => {
+                Object.keys(userAnswers).forEach(key => userAnswers[key] = null);
+                document.querySelectorAll('.option-button.selected').forEach(btn => btn.classList.remove('selected'));
+                showScreen(0);
+            });
+
+            document.querySelectorAll('.option-button').forEach(button => {
+                button.classList.add(
+                    'flex', 'flex-col', 'items-center', 'justify-center', 'p-4', 'border-2', 'border-slate-200', 'rounded-lg', 'text-slate-700', 'font-semibold', 'hover:border-indigo-500', 'hover:text-indigo-600', 'transition-all', 'duration-200', 'gap-2', 'text-center'
+                );
+                button.addEventListener('click', () => {
+                    const { question, value } = button.dataset;
+                    userAnswers[question] = value;
+                    document.querySelectorAll(`.option-button[data-question="${question}"]`).forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    updateNavButtons();
+                });
+            });
+
+            // Modal listeners
+            [termsLinkIntro, termsLinkResult].forEach(link => link.addEventListener('click', (e) => {
+                e.preventDefault();
+                termsModal.classList.remove('hidden');
+            }));
+            closeModalBtn.addEventListener('click', () => termsModal.classList.add('hidden'));
+            termsModal.addEventListener('click', (e) => {
+                if (e.target === termsModal) { // Close if clicking on overlay
+                    termsModal.classList.add('hidden');
+                }
+            });
+            
+            // --- Result Evaluation Logic ---
+            function evaluateResults() {
+                const { useCase, decisionImpact } = userAnswers;
+                let riskLevelClass = '', status = '', risk = '', actions = '', iconHtml = '';
+
+                const icons = {
+                    high: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-alert mx-auto text-red-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>`,
+                    limited: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye mx-auto text-yellow-500"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
+                    minimal: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check mx-auto text-green-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>`,
+                    clarification: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-check mx-auto text-blue-500"><path d="m8 11 4 4 6-6"/><path d="M15.5 15.5 19 19"/><circle cx="11" cy="11" r="8"/></svg>`
+                };
+                
+                const highRiskActions = `
+                    <ul class="list-disc list-inside">
+                        <li>Conduct a full conformity assessment before placing the system on the market.</li>
+                        <li>Establish a robust risk management system to identify, evaluate, and mitigate risks.</li>
+                        <li>Ensure high-quality data governance for training, validation, and testing data.</li>
+                        <li>Prepare and maintain comprehensive technical documentation.</li>
+                        <li>Implement appropriate human oversight measures.</li>
+                        <li>Ensure a high level of robustness, accuracy, and cybersecurity.</li>
+                    </ul>`;
+                const limitedRiskActions = `
+                    <ul class="list-disc list-inside">
+                        <li>Ensure transparency obligations are met by informing users they are interacting with an AI.</li>
+                        <li>Clearly label AI-generated content (e.g., "deep fakes") as such.</li>
+                        <li>Review specific requirements for your system type under the AI Act.</li>
+                    </ul>`;
+                const minimalRiskActions = `
+                    <ul class="list-disc list-inside">
+                        <li>Consider adopting a voluntary code of conduct for best practices.</li>
+                        <li>Continue to monitor the system's use and impact to ensure it remains minimal risk.</li>
+                        <li>Ensure compliance with other relevant legislation (e.g., GDPR, product safety).</li>
+                    </ul>`;
+                const clarificationActions = `
+                    <ul class="list-disc list-inside">
+                         <li>Gather precise information about your system's capabilities, intended use, and context.</li>
+                         <li>Consult with legal or technical experts to clarify your role and the system's impact.</li>
+                         <li>Re-take this assessment once you have clear answers.</li>
+                    </ul>`;
+
+                const sensitiveUseAreas = ["Employment", "Biometrics", "Credit", "Healthcare", "Critical infrastructure", "Education"];
+                const isCriticalUseCase = sensitiveUseAreas.includes(useCase);
+                const isSureAboutAnswers = !Object.values(userAnswers).some(answer => answer === "I'm not sure");
+
+                if (!isSureAboutAnswers) {
+                    riskLevelClass = 'bg-blue-100 text-blue-800 border-l-4 border-blue-500';
+                    status = 'Clarification Needed';
+                    risk = "You selected 'I'm not sure' for one or more questions. An accurate risk assessment requires clear answers about your system and its context.";
+                    actions = clarificationActions;
+                    iconHtml = icons.clarification;
+                } else if (isCriticalUseCase || decisionImpact === 'Yes') {
+                    riskLevelClass = 'bg-red-100 text-red-800 border-l-4 border-red-500';
+                    status = 'Compliance Status: High Risk';
+                    risk = "Based on your answers, your AI system is likely to be classified as **High-Risk** under the EU AI Act. This classification entails significant legal and technical obligations.";
+                    actions = highRiskActions;
+                    iconHtml = icons.high;
+                } else if (useCase === 'None' && decisionImpact === 'No' && userAnswers.documentation === 'Yes') {
+                    riskLevelClass = 'bg-green-100 text-green-800 border-l-4 border-green-500';
+                    status = 'Compliance Status: Minimal Risk';
+                    risk = "Your AI system appears to fall into the **Minimal-Risk** category. These systems are generally permitted without extensive additional obligations under the EU AI Act.";
+                    actions = minimalRiskActions;
+                    iconHtml = icons.minimal;
+                } else {
+                    riskLevelClass = 'bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500';
+                    status = 'Compliance Status: Limited Risk';
+                    risk = "Your AI system's profile suggests it might be **Limited-Risk**. This category often involves specific transparency obligations rather than the full set of requirements for high-risk systems.";
+                    actions = limitedRiskActions;
+                    iconHtml = icons.limited;
+                }
+
+                resultBox.className = `result-box rounded-xl p-6 mb-6 text-center transition-all duration-500 ${riskLevelClass}`;
+                resultIcon.innerHTML = iconHtml;
+                resultStatus.innerHTML = status;
+                resultRisk.innerHTML = risk;
+                resultActions.innerHTML = actions;
+            }
+            
+            showScreen(0); // Initial screen
+        });
+    </script>
+</body>
+</html>
